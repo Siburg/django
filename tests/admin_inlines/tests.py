@@ -10,10 +10,9 @@ from .admin import InnerInline, site as admin_site
 from .models import (
     Author, BinaryTree, Book, Chapter, Child, ChildModel1, ChildModel2,
     Fashionista, FootNote, Holder, Holder2, Holder3, Holder4, Inner, Inner2,
-    Inner3, Inner4Stacked, Inner4Tabular, MultiVerboseChild, MultiVerboseParent,
-    NonVerboseChild, Novel, OutfitItem, Parent, ParentModelWithCustomPk, Person,
-    Poll, Profile, ProfileCollection, Question, Sighting, SomeChildModel,
-    SomeParentModel, Teacher, VerboseChild, VerboseParent, VerbosePluralChild,
+    Inner3, Inner4Stacked, Inner4Tabular, MultiVerboseParent, Novel, OutfitItem,
+    Parent, ParentModelWithCustomPk, Person, Poll, Profile, ProfileCollection,
+    Question, Sighting, SomeChildModel, SomeParentModel, Teacher, VerboseParent,
     VerbosePluralParent,
 )
 
