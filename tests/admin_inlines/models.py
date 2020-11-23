@@ -304,3 +304,59 @@ class Profile(models.Model):
     collection = models.ForeignKey(ProfileCollection, models.SET_NULL, blank=True, null=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+
+
+# Models for #32219 and earlier functionality
+# Test combinations with verbose_name and verbose_name_plural
+# in model metas and admin inlines.
+class VerboseParent(models.Model):
+    """
+    Has inlines for its admin class that include a verbose_name
+    (but not a verbose_plural name).
+    """
+    pass
+
+
+class VerbosePluralParent(models.Model):
+    """
+    Has inlines for its admin class that include a verbose_plural_name
+    (but not a verbose name).
+    """
+    pass
+
+
+class MultiVerboseParent(models.Model):
+    """
+    Has inlines for its admin class that include both a verbose_name
+    and a verbose_plural name.
+    """
+    pass
+
+
+class NonVerboseChild(models.Model):
+    verbose_parent = models.ForeignKey(VerboseParent, models.CASCADE, null=True)
+    verbose_plural_parent = models.ForeignKey(VerbosePluralParent, models.CASCADE, null=True)
+    multi_verbose_parent = models.ForeignKey(MultiVerboseParent, models.CASCADE, null=True)
+
+    class Meta:
+        # Does not contain verbose_name or verbose_name_plural.
+        pass
+
+
+class VerboseChild(NonVerboseChild):
+
+    class Meta:
+        verbose_name = 'Meta Verbose Child'
+
+
+class VerbosePluralChild(NonVerboseChild):
+
+    class Meta:
+        verbose_name_plural = 'Meta Plural Children'
+
+
+class MultiVerboseChild(NonVerboseChild):
+
+    class Meta:
+        verbose_name = 'Meta Multi Child'
+        verbose_name_plural = 'Meta Multi Children'

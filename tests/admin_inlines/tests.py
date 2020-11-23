@@ -10,9 +10,11 @@ from .admin import InnerInline, site as admin_site
 from .models import (
     Author, BinaryTree, Book, Chapter, Child, ChildModel1, ChildModel2,
     Fashionista, FootNote, Holder, Holder2, Holder3, Holder4, Inner, Inner2,
-    Inner3, Inner4Stacked, Inner4Tabular, Novel, OutfitItem, Parent,
-    ParentModelWithCustomPk, Person, Poll, Profile, ProfileCollection,
-    Question, Sighting, SomeChildModel, SomeParentModel, Teacher,
+    Inner3, Inner4Stacked, Inner4Tabular, MultiVerboseChild, MultiVerboseParent,
+    NonVerboseChild, Novel, OutfitItem, Parent, ParentModelWithCustomPk, Person,
+    Poll, Profile, ProfileCollection, Question, Sighting, SomeChildModel,
+    SomeParentModel, Teacher, VerboseChild, VerboseParent, VerbosePluralChild,
+    VerbosePluralParent,
 )
 
 INLINE_CHANGELINK_HTML = 'class="inlinechangelink">Change</a>'
@@ -950,6 +952,84 @@ class TestReadOnlyChangeViewInlinePermissions(TestCase):
     def test_extra_inlines_are_not_shown(self):
         response = self.client.get(self.change_url)
         self.assertNotContains(response, 'id="id_question_set-0-text"')
+
+
+@override_settings(ROOT_URLCONF='admin_inlines.urls')
+class TestInlineVerboseNameForms(TestDataMixin, TestCase):
+
+    def setUp(self):
+        self.client.force_login(self.superuser)
+
+    def test_verbose_parent(self):
+        parent = VerboseParent.objects.create()
+        url = reverse('admin:admin_inlines_verboseparent_change', args=(parent.id,))
+        response = self.client.get(url)
+        # NonVerboseChild tests
+        self.assertContains(response, '<h2>Inline Non-Verbose Kids</h2>')
+        self.assertContains(response, 'Add another Inline Non-Verbose Kid')
+        self.assertNotContains(response, '<h2>Non verbose childs</h2>')
+        self.assertNotContains(response, 'Add another Non verbose child')
+        # VerboseChild tests
+        self.assertContains(response, '<h2>Inline Verbose Kids</h2>')
+        self.assertContains(response, 'Add another Inline Verbose Kid')
+        self.assertNotContains(response, '<h2>Meta Verbose Childs</h2>')
+        self.assertNotContains(response, 'Add another Meta Verbose Child')
+        # VerbosePluralChild tests
+        self.assertContains(response, '<h2>Inline Verbose Plural Kids</h2>')
+        self.assertContains(response, 'Add another Inline Verbose Plural Kid')
+        self.assertNotContains(response, '<h2>Meta Plural Children</h2>')
+        self.assertNotContains(response, 'Add another Verbose plural child')
+        # MultiVerboseChild tests
+        self.assertContains(response, '<h2>Inline Multi-Verbose Kids</h2>')
+        self.assertContains(response, 'Add another Inline Multi-Verbose Kid')
+        self.assertNotContains(response, '<h2>Meta Multi Children</h2>')
+        self.assertNotContains(response, 'Add another Meta Multi Child')
+
+    def test_verbose_plural_parent(self):
+        parent = VerbosePluralParent.objects.create()
+        url = reverse('admin:admin_inlines_verbosepluralparent_change', args=(parent.id,))
+        response = self.client.get(url)
+        # NonVerboseChild tests
+        self.assertContains(response, '<h2>Inline Non-Verbose Kids</h2>')
+        self.assertContains(response, 'Add another Non verbose child')
+        self.assertNotContains(response, '<h2>Non verbose childs</h2>')
+        # VerboseChild tests
+        self.assertContains(response, '<h2>Inline Verbose Kids</h2>')
+        self.assertContains(response, 'Add another Meta Verbose Child')
+        self.assertNotContains(response, '<h2>Meta Verbose Childs</h2>')
+        # VerbosePluralChild tests
+        self.assertContains(response, '<h2>Inline Verbose Plural Kids</h2>')
+        self.assertContains(response, 'Add another Verbose plural child')
+        self.assertNotContains(response, '<h2>Meta Plural Children</h2>')
+        # MultiVerboseChild tests
+        self.assertContains(response, '<h2>Inline Multi-Verbose Kids</h2>')
+        self.assertContains(response, 'Add another Meta Multi Child')
+        self.assertNotContains(response, '<h2>Meta Multi Children</h2>')
+
+    def test_multi_verbose_parent(self):
+        parent = MultiVerboseParent.objects.create()
+        url = reverse('admin:admin_inlines_multiverboseparent_change', args=(parent.id,))
+        response = self.client.get(url)
+        # NonVerboseChild tests
+        self.assertContains(response, '<h2>Inline Non-Verbose Kids</h2>')
+        self.assertContains(response, 'Add another Inline Non-Verbose Kid')
+        self.assertNotContains(response, '<h2>Non verbose childs</h2>')
+        self.assertNotContains(response, 'Add another Non verbose child')
+        # VerboseChild tests
+        self.assertContains(response, '<h2>Inline Verbose Kids</h2>')
+        self.assertContains(response, 'Add another Inline Verbose Kid')
+        self.assertNotContains(response, '<h2>Meta Verbose Childs</h2>')
+        self.assertNotContains(response, 'Add another Meta Verbose Child')
+        # VerbosePluralChild tests
+        self.assertContains(response, '<h2>Inline Verbose Plural Kids</h2>')
+        self.assertContains(response, 'Add another Inline Verbose Plural Kid')
+        self.assertNotContains(response, '<h2>Meta Plural Children</h2>')
+        self.assertNotContains(response, 'Add another Verbose plural child')
+        # MultiVerboseChild tests
+        self.assertContains(response, '<h2>Inline Multi-Verbose Kids</h2>')
+        self.assertContains(response, 'Add another Inline Multi-Verbose Kid')
+        self.assertNotContains(response, '<h2>Meta Multi Children</h2>')
+        self.assertNotContains(response, 'Add another Meta Multi Child')
 
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')

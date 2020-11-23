@@ -7,11 +7,13 @@ from .models import (
     Author, BinaryTree, CapoFamiglia, Chapter, Child, ChildModel1, ChildModel2,
     Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, FootNote,
     Holder, Holder2, Holder3, Holder4, Holder5, Inner, Inner2, Inner3,
-    Inner4Stacked, Inner4Tabular, Inner5Stacked, Inner5Tabular, NonAutoPKBook,
+    Inner4Stacked, Inner4Tabular, Inner5Stacked, Inner5Tabular,
+    MultiVerboseChild, MultiVerboseParent, NonAutoPKBook, NonVerboseChild,
     NonAutoPKBookChild, Novel, NovelReadonlyChapter, OutfitItem,
     ParentModelWithCustomPk, Poll, Profile, ProfileCollection, Question,
     ReadOnlyInline, ShoppingWeakness, Sighting, SomeChildModel,
     SomeParentModel, SottoCapo, Teacher, Title, TitleCollection,
+    VerboseChild, VerboseParent, VerbosePluralChild, VerbosePluralParent,
 )
 
 site = admin.AdminSite(name="admin")
@@ -292,6 +294,103 @@ class TeacherAdmin(admin.ModelAdmin):
     inlines = [StudentInline]
 
 
+# admin for #32219 and earlier functionality
+# classes for testing combinations of verbose and verbose_plural
+# settings in models and in inlines.
+class NonVerboseChildVerboseParentInline(admin.TabularInline):
+    model = NonVerboseChild
+    verbose_name = 'Inline Non-Verbose Kid'
+
+
+class VerboseChildVerboseParentInline(admin.TabularInline):
+    model = VerboseChild
+    verbose_name = 'Inline Verbose Kid'
+
+
+class VerbosePluralChildVerboseParentInline(admin.TabularInline):
+    model = VerbosePluralChild
+    verbose_name = 'Inline Verbose Plural Kid'
+
+
+class MultiVerboseChildVerboseParentInline(admin.TabularInline):
+    model = MultiVerboseChild
+    verbose_name = 'Inline Multi-Verbose Kid'
+
+
+class NonVerboseChildVerbosePluralParentInline(admin.TabularInline):
+    model = NonVerboseChild
+    verbose_name_plural = 'Inline Non-Verbose Kids'
+
+
+class VerboseChildVerbosePluralParentInline(admin.TabularInline):
+    model = VerboseChild
+    verbose_name_plural = 'Inline Verbose Kids'
+
+
+class VerbosePluralChildVerbosePluralParentInline(admin.TabularInline):
+    model = VerbosePluralChild
+    verbose_name_plural = 'Inline Verbose Plural Kids'
+
+
+class MultiVerboseChildVerbosePluralParentInline(admin.TabularInline):
+    model = MultiVerboseChild
+    verbose_name_plural = 'Inline Multi-Verbose Kids'
+
+
+class NonVerboseChildMultiVerboseParentInline(admin.TabularInline):
+    model = NonVerboseChild
+    verbose_name = 'Inline Non-Verbose Kid'
+    verbose_name_plural = 'Inline Non-Verbose Kids'
+
+
+class VerboseChildMultiVerboseParentInline(admin.TabularInline):
+    model = VerboseChild
+    verbose_name = 'Inline Verbose Kid'
+    verbose_name_plural = 'Inline Verbose Kids'
+
+
+class VerbosePluralChildMultiVerboseParentInline(admin.TabularInline):
+    model = VerbosePluralChild
+    verbose_name = 'Inline Verbose Plural Kid'
+    verbose_name_plural = 'Inline Verbose Plural Kids'
+
+
+class MultiVerboseChildMultiVerboseParentInline(admin.TabularInline):
+    model = MultiVerboseChild
+    verbose_name = 'Inline Multi-Verbose Kid'
+    verbose_name_plural = 'Inline Multi-Verbose Kids'
+
+
+class VerboseParentAdmin(admin.ModelAdmin):
+
+    inlines = [
+        NonVerboseChildVerboseParentInline,
+        VerboseChildVerboseParentInline,
+        VerbosePluralChildVerboseParentInline,
+        MultiVerboseChildVerboseParentInline,
+    ]
+
+
+class VerbosePluralParentAdmin(admin.ModelAdmin):
+
+    inlines = [
+        NonVerboseChildVerbosePluralParentInline,
+        VerboseChildVerbosePluralParentInline,
+        VerbosePluralChildVerbosePluralParentInline,
+        MultiVerboseChildVerbosePluralParentInline,
+    ]
+
+
+class MultiVerboseParentAdmin(admin.ModelAdmin):
+
+    inlines = [
+        NonVerboseChildMultiVerboseParentInline,
+        VerboseChildMultiVerboseParentInline,
+        VerbosePluralChildMultiVerboseParentInline,
+        MultiVerboseChildMultiVerboseParentInline,
+    ]
+
+
 site.register(TitleCollection, inlines=[TitleInline])
 # Test bug #12561 and #12778
 # only ModelAdmin media
@@ -318,3 +417,6 @@ site.register([Question, Inner4Stacked, Inner4Tabular])
 site.register(Teacher, TeacherAdmin)
 site.register(Chapter, inlines=[FootNoteNonEditableInlineCustomForm])
 site.register(OutfitItem, inlines=[WeaknessInlineCustomForm])
+site.register(VerboseParent, VerboseParentAdmin)
+site.register(VerbosePluralParent, VerbosePluralParentAdmin)
+site.register(MultiVerboseParent, MultiVerboseParentAdmin)
