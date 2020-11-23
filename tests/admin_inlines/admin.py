@@ -8,12 +8,12 @@ from .models import (
     Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, FootNote,
     Holder, Holder2, Holder3, Holder4, Holder5, Inner, Inner2, Inner3,
     Inner4Stacked, Inner4Tabular, Inner5Stacked, Inner5Tabular,
-    MultiVerboseChild, MultiVerboseParent, NonAutoPKBook, NonVerboseChild,
-    NonAutoPKBookChild, Novel, NovelReadonlyChapter, OutfitItem,
+    MultiVerboseChild, MultiVerboseParent, NonAutoPKBook, NonAutoPKBookChild,
+    NonVerboseChild, Novel, NovelReadonlyChapter, OutfitItem,
     ParentModelWithCustomPk, Poll, Profile, ProfileCollection, Question,
     ReadOnlyInline, ShoppingWeakness, Sighting, SomeChildModel,
-    SomeParentModel, SottoCapo, Teacher, Title, TitleCollection,
-    VerboseChild, VerboseParent, VerbosePluralChild, VerbosePluralParent,
+    SomeParentModel, SottoCapo, Teacher, Title, TitleCollection, VerboseChild,
+    VerboseParent, VerbosePluralChild, VerbosePluralParent,
 )
 
 site = admin.AdminSite(name="admin")
