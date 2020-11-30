@@ -2400,7 +2400,9 @@ The ``InlineModelAdmin`` class adds or customizes:
 .. attribute:: InlineModelAdmin.verbose_name_plural
 
     An override to the ``verbose_name_plural`` found in the model's inner
-    ``Meta`` class.
+    ``Meta`` class. If a ``verbose_name`` is specified for the inline object
+    then the default value for its ``verbose_name_plural`` is that specified
+    ``verbose_name + 's'``.
 
 .. attribute:: InlineModelAdmin.can_delete
 
