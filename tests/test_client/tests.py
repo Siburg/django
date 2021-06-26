@@ -28,11 +28,29 @@ from django.core import mail
 from django.http import HttpResponse, HttpResponseNotAllowed
 from django.test import (
     AsyncRequestFactory, Client, RequestFactory, SimpleTestCase, TestCase,
-    override_settings,
+    modify_settings, override_settings,
 )
 from django.urls import reverse_lazy
+from django.utils.decorators import async_only_middleware
 
 from .views import TwoArgException, get_view, post_view, trace_view
+
+
+def middleware_urlconf(get_response):
+    def middleware(request):
+        request.urlconf = 'tests.test_client.urls_middleware_urlconf'
+        return get_response(request)
+
+    return middleware
+
+
+@async_only_middleware
+def async_middleware_urlconf(get_response):
+    async def middleware(request):
+        request.urlconf = 'tests.test_client.urls_middleware_urlconf'
+        return await get_response(request)
+
+    return middleware
 
 
 @override_settings(ROOT_URLCONF='test_client.urls')
@@ -194,6 +212,11 @@ class ClientTest(TestCase):
         """
         response = self.client.get('/get_view/')
         self.assertEqual(response.resolver_match.url_name, 'get_view')
+
+    @modify_settings(MIDDLEWARE={'prepend': 'test_client.tests.middleware_urlconf'})
+    def test_response_resolver_match_middleware_urlconf(self):
+        response = self.client.get('/middleware_urlconf_view/')
+        self.assertEqual(response.resolver_match.url_name, 'middleware_urlconf_view')
 
     def test_raw_post(self):
         "POST raw data (with a content type) to a view"
@@ -739,6 +762,13 @@ class ClientTest(TestCase):
         response = self.client.get('/django_project_redirect/')
         self.assertRedirects(response, 'https://www.djangoproject.com/', fetch_redirect_response=False)
 
+    def test_external_redirect_without_trailing_slash(self):
+        """
+        Client._handle_redirects() with an empty path.
+        """
+        response = self.client.get('/no_trailing_slash_external_redirect/', follow=True)
+        self.assertRedirects(response, 'https://testserver')
+
     def test_external_redirect_with_fetch_error_msg(self):
         """
         assertRedirects without fetch_redirect_response=False raises
@@ -864,8 +894,11 @@ class ClientTest(TestCase):
         self.assertEqual(response.content, b'temp_file')
 
     def test_uploading_named_temp_file(self):
-        test_file = tempfile.NamedTemporaryFile()
-        response = self.client.post('/upload_view/', data={'named_temp_file': test_file})
+        with tempfile.NamedTemporaryFile() as test_file:
+            response = self.client.post(
+                '/upload_view/',
+                data={'named_temp_file': test_file},
+            )
         self.assertEqual(response.content, b'named_temp_file')
 
 
@@ -951,6 +984,13 @@ class AsyncClientTest(TestCase):
         response = await self.async_client.get('/async_get_view/')
         self.assertTrue(hasattr(response, 'resolver_match'))
         self.assertEqual(response.resolver_match.url_name, 'async_get_view')
+
+    @modify_settings(
+        MIDDLEWARE={'prepend': 'test_client.tests.async_middleware_urlconf'},
+    )
+    async def test_response_resolver_match_middleware_urlconf(self):
+        response = await self.async_client.get('/middleware_urlconf_view/')
+        self.assertEqual(response.resolver_match.url_name, 'middleware_urlconf_view')
 
     async def test_follow_parameter_not_implemented(self):
         msg = 'AsyncClient request methods do not accept the follow parameter.'

@@ -5,6 +5,14 @@ from django.db import models
 
 from .models import (
     Author, BinaryTree, CapoFamiglia, Chapter, Child, ChildModel1, ChildModel2,
+    Class, Consigliere, Course, CourseProxy, CourseProxy1, CourseProxy2,
+    EditablePKBook, ExtraTerrestrial, Fashionista, FootNote, Holder, Holder2,
+    Holder3, Holder4, Holder5, Inner, Inner2, Inner3, Inner4Stacked,
+    Inner4Tabular, Inner5Stacked, Inner5Tabular, NonAutoPKBook,
+    NonAutoPKBookChild, Novel, NovelReadonlyChapter, OutfitItem,
+    ParentModelWithCustomPk, Person, Poll, Profile, ProfileCollection,
+    Question, ReadOnlyInline, ShoppingWeakness, Sighting, SomeChildModel,
+    SomeParentModel, SottoCapo, Teacher, Title, TitleCollection,
     Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, FootNote,
     Holder, Holder2, Holder3, Holder4, Holder5, Inner, Inner2, Inner3,
     Inner4Stacked, Inner4Tabular, Inner5Stacked, Inner5Tabular,
@@ -294,6 +302,55 @@ class TeacherAdmin(admin.ModelAdmin):
     inlines = [StudentInline]
 
 
+class AuthorTabularInline(admin.TabularInline):
+    model = Author
+
+
+class FashonistaStackedInline(admin.StackedInline):
+    model = Fashionista
+
+
+# Admin for #30231
+class ClassStackedHorizontal(admin.StackedInline):
+    model = Class
+    extra = 1
+    filter_horizontal = ['person']
+
+
+class ClassAdminStackedHorizontal(admin.ModelAdmin):
+    inlines = [ClassStackedHorizontal]
+
+
+class ClassTabularHorizontal(admin.TabularInline):
+    model = Class
+    extra = 1
+    filter_horizontal = ['person']
+
+
+class ClassAdminTabularHorizontal(admin.ModelAdmin):
+    inlines = [ClassTabularHorizontal]
+
+
+class ClassTabularVertical(admin.TabularInline):
+    model = Class
+    extra = 1
+    filter_vertical = ['person']
+
+
+class ClassAdminTabularVertical(admin.ModelAdmin):
+    inlines = [ClassTabularVertical]
+
+
+class ClassStackedVertical(admin.StackedInline):
+    model = Class
+    extra = 1
+    filter_vertical = ['person']
+
+
+class ClassAdminStackedVertical(admin.ModelAdmin):
+    inlines = [ClassStackedVertical]
+
+
 # admin for #32219 and earlier functionality
 # classes for testing combinations of verbose and verbose_plural
 # settings in models and in inlines.
@@ -417,6 +474,11 @@ site.register([Question, Inner4Stacked, Inner4Tabular])
 site.register(Teacher, TeacherAdmin)
 site.register(Chapter, inlines=[FootNoteNonEditableInlineCustomForm])
 site.register(OutfitItem, inlines=[WeaknessInlineCustomForm])
+site.register(Person, inlines=[AuthorTabularInline, FashonistaStackedInline])
+site.register(Course, ClassAdminStackedHorizontal)
+site.register(CourseProxy, ClassAdminStackedVertical)
+site.register(CourseProxy1, ClassAdminTabularVertical)
+site.register(CourseProxy2, ClassAdminTabularHorizontal)
 site.register(VerboseParent, VerboseParentAdmin)
 site.register(VerbosePluralParent, VerbosePluralParentAdmin)
 site.register(MultiVerboseParent, MultiVerboseParentAdmin)

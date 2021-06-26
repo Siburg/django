@@ -1,9 +1,11 @@
 from django.core.exceptions import FieldDoesNotExist
+from django.db.migrations.utils import (
+    field_is_referenced, field_references, get_references,
+)
 from django.db.models import NOT_PROVIDED
 from django.utils.functional import cached_property
 
 from .base import Operation
-from .utils import field_is_referenced, field_references, get_references
 
 
 class FieldOperation(Operation):
@@ -392,8 +394,11 @@ class RenameField(FieldOperation):
                 ),
             ]
         # Skip `FieldOperation.reduce` as we want to run `references_field`
-        # against self.new_name.
+        # against self.old_name and self.new_name.
         return (
             super(FieldOperation, self).reduce(operation, app_label) or
-            not operation.references_field(self.model_name, self.new_name, app_label)
+            not (
+                operation.references_field(self.model_name, self.old_name, app_label) or
+                operation.references_field(self.model_name, self.new_name, app_label)
+            )
         )

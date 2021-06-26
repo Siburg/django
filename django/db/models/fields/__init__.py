@@ -183,8 +183,7 @@ class Field(RegisterLookupMixin):
         if not hasattr(self, 'model'):
             return super().__str__()
         model = self.model
-        app = model._meta.app_label
-        return '%s.%s.%s' % (app, model._meta.object_name, self.name)
+        return '%s.%s' % (model._meta.label, self.name)
 
     def __repr__(self):
         """Display the module, class, and name of the field."""
@@ -420,8 +419,8 @@ class Field(RegisterLookupMixin):
 
          * The name of the field on the model, if contribute_to_class() has
            been run.
-         * The import path of the field, including the class:e.g.
-           django.db.models.IntegerField This should be the most portable
+         * The import path of the field, including the class, e.g.
+           django.db.models.IntegerField. This should be the most portable
            version, so less specific may be better.
          * A list of positional arguments.
          * A dict of keyword arguments.
@@ -783,11 +782,7 @@ class Field(RegisterLookupMixin):
         self.model = cls
         cls._meta.add_field(self, private=private_only)
         if self.column:
-            # Don't override classmethods with the descriptor. This means that
-            # if you have a classmethod and a field with the same name, then
-            # such fields can't be deferred (we don't have a check for this).
-            if not getattr(cls, self.attname, None):
-                setattr(cls, self.attname, self.descriptor_class(self))
+            setattr(cls, self.attname, self.descriptor_class(self))
         if self.choices is not None:
             # Don't override a get_FOO_display() method defined explicitly on
             # this class, but don't check methods derived from inheritance, to
@@ -1988,13 +1983,13 @@ class NullBooleanField(BooleanField):
         'invalid_nullable': _('“%(value)s” value must be either None, True or False.'),
     }
     description = _("Boolean (Either True, False or None)")
-    system_check_deprecated_details = {
+    system_check_removed_details = {
         'msg': (
-            'NullBooleanField is deprecated. Support for it (except in '
-            'historical migrations) will be removed in Django 4.0.'
+            'NullBooleanField is removed except for support in historical '
+            'migrations.'
         ),
         'hint': 'Use BooleanField(null=True) instead.',
-        'id': 'fields.W903',
+        'id': 'fields.E903',
     }
 
     def __init__(self, *args, **kwargs):
@@ -2525,7 +2520,7 @@ class AutoFieldMeta(type):
         return isinstance(instance, self._subclasses) or super().__instancecheck__(instance)
 
     def __subclasscheck__(self, subclass):
-        return subclass in self._subclasses or super().__subclasscheck__(subclass)
+        return issubclass(subclass, self._subclasses) or super().__subclasscheck__(subclass)
 
 
 class AutoField(AutoFieldMixin, IntegerField, metaclass=AutoFieldMeta):

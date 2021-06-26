@@ -725,7 +725,10 @@ class Client(ClientMixin, RequestFactory):
         response.context = data.get('context')
         response.json = partial(self._parse_json, response)
         # Attach the ResolverMatch instance to the response.
-        response.resolver_match = SimpleLazyObject(lambda: resolve(request['PATH_INFO']))
+        urlconf = getattr(response.wsgi_request, 'urlconf', None)
+        response.resolver_match = SimpleLazyObject(
+            lambda: resolve(request['PATH_INFO'], urlconf=urlconf),
+        )
         # Flatten a single context. Not really necessary anymore thanks to the
         # __getattr__ flattening in ContextList, but has some edge case
         # backwards compatibility implications.
@@ -831,7 +834,7 @@ class Client(ClientMixin, RequestFactory):
                 extra['SERVER_PORT'] = str(url.port)
 
             # Prepend the request path to handle relative path redirects
-            path = url.path
+            path = url.path or '/'
             if not path.startswith('/'):
                 path = urljoin(response.request['PATH_INFO'], path)
 
@@ -914,7 +917,10 @@ class AsyncClient(ClientMixin, AsyncRequestFactory):
         response.context = data.get('context')
         response.json = partial(self._parse_json, response)
         # Attach the ResolverMatch instance to the response.
-        response.resolver_match = SimpleLazyObject(lambda: resolve(request['path']))
+        urlconf = getattr(response.asgi_request, 'urlconf', None)
+        response.resolver_match = SimpleLazyObject(
+            lambda: resolve(request['path'], urlconf=urlconf),
+        )
         # Flatten a single context. Not really necessary anymore thanks to the
         # __getattr__ flattening in ContextList, but has some edge case
         # backwards compatibility implications.
