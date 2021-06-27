@@ -623,10 +623,6 @@ backends.
 * Pagination links in the admin are now 1-indexed instead of 0-indexed, i.e.
   the query string for the first page is ``?p=1`` instead of ``?p=0``.
 
-* The default ``verbose_name_plural`` for an ``InlineModelAdmin`` (sub-)class
-  is now its ``verbose_name + 's'`` if the ``verbose_name`` is specified in
-  that ``InlineModelAdmin`` (sub-)class, instead of being the
-  ``verbose_name_plural`` for the model class.
 * The new admin catch-all view will break URL patterns routed after the admin
   URLs and matching the admin URL prefix. You can either adjust your URL
   ordering or, if necessary, set :attr:`AdminSite.final_catch_all_view
