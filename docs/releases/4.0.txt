@@ -79,8 +79,8 @@ Minor features
   descriptive text for the search box.
 
 * If a :attr:`~django.contrib.admin.InlineModelAdmin.verbose_name` is given for
-  an :class:`~django.contrib.admin.options.InlineModelAdmin` (sub-)class then
-  the default value for its
+  an :class:`~django.contrib.admin.InlineModelAdmin` (sub-)class then the
+  default value for its
   :attr:`~django.contrib.admin.InlineModelAdmin.verbose_name_plural` is now
   that given ``verbose_name + 's'``, instead of being the
   :attr:`~django.db.models.Options.verbose_name_plural` from the model class.
